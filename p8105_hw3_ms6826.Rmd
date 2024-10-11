@@ -13,11 +13,12 @@ library(ggridges)
 ```
 
 ## Problem 1
+Loading Data
 ```{r}
 data("ny_noaa")
 ```
-Short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue
---This dataset is very large (over 2.5 million observations) because it includes records from over 100,000 weather stations (with separate observations for the same day from different stations) and includes daily records of variables like total precipitation, maximum and minimum temperatures, total snowfall, etc. There is a lot of variability in the data, as about half of the stations only report precipitation and each station covers varying periods of time. Since we have so many observations for each day, I don't think missing data will be a huge issue once we can compile the observations for each day. 
+This dataset is very large (with over 2.5 million observations) because it includes records from over 100,000 weather stations (with separate observations for the same day from different stations) and includes daily records of variables such as total precipitation, maximum and minimum temperatures, total snowfall, etc. There is a lot of variability in the data, as about half of the stations only report precipitation, and each station covers varying periods of time. Since we have so many observations for each day, I don't think missing data will be a huge issue once we can compile the observations for each day. 
+
 
 Data Cleaning
 ```{r}
@@ -38,7 +39,16 @@ ny_noaa |>
   ) |> 
   mutate(tmin=tmin/10)
 ```
-Comment--Separating date into 3 variables (year month day). Converting prcp to units of mm so that snowfall, snow depth, and precipitation are all in millimeters. Converting tmax and tmin to units of Celcius.
+Separated date into 3 variables (year month day). Converted prcp to units of mm so that snowfall, snow depth, and precipitation are all in millimeters. Converted tmax and tmin to units of Celcius.
+
+```{r}
+ny_noaa_clean |> 
+  count(snow) |> 
+  arrange(desc(n)) |> 
+  head()
+```
+The most commonly observed values for snowfall is 0 mm. This may be because this data is collected station information from over 180 countries and territories, and these places may be in climates that do not often have snow.
+ 
  
 Making a two-panel plot
 ```{r}
@@ -59,8 +69,8 @@ ggplot_avgtmax=
 ggplot_avgtmax
 
 ```
-Is there any observable / interpretable structure? Any outliers? 
---As predicted, the mean max temperature for the stations in January (winter weather) are on average ~25 degrees Celcius lower than the mean max temperatures in July (summer weather). The graph also indicates that there is more variation in temperature in January (points are more spread out) compared to July. There are a few outliers for each month that are below the general mean temperature for that year, and the most significant outlier is for a station in July in the year 1988.
+The mean max temperature for the stations in January (winter weather) are on average ~25 degrees Celcius lower than the mean max temperatures in July (summer weather). The graph also indicates that there is more variation in temperature in January (points are more spread out) compared to July. There are a few outliers for each month that are below the general mean temperature for that year, and the most significant outlier is for a station in July in the year 1988.
+
 
 Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
 ```{r}
@@ -86,8 +96,9 @@ ggp_snow=
 (ggp_tmax_tmin + ggp_snow)
 ```
 
+
 ## Problem 2
-Load, tidy, merge, and otherwise organize the data sets
+Load, tidy, merge, and organize the data sets
 ```{r}
 covar_df=
   read_csv("data/nhanes_covar.csv", skip=4, na= c("NA")) |> 
@@ -139,11 +150,13 @@ ggp_age=
        x = "Education Level",
        y = "Age") +
   theme_minimal()
-```
-Comment
----The reader friendly table tells us that most of the men and women have an education level greater than high school. The lowest frequency of education level for both men and women is "less than high school equivalent". The graph tells us that the median age (for both men and women) for those with above high school education is lower (~45 years) than the median age for education levels at or below high school.
 
-Using your tidied dataset, aggregate across minutes to create a total activity variable for each participant. Plot these total activities (y-axis) against age (x-axis); your plot should compare men to women and have separate panels for each education level. Include a trend line or a smooth to illustrate differences. 
+ggp_age
+```
+The reader friendly table tells us that most of the men and women have an education level greater than high school level. The lowest frequency of education level for both men and women is "less than high school equivalent". The graph tells us that the median age (for both men and women) for those with above high school education is lower (~45 years) than the median age for education levels at or below high school level.
+
+
+Create a total activity variable and plot against age.
 ```{r}
 mims_ag_df=
   mims_df |>
@@ -163,11 +176,10 @@ ggplot_activity=
 
 ggplot_activity
 ```
-Comment
----As expected, total activity is generally highest for younger ages and lowest for older ages. The smooth lines indicate that females with education high school equivalent or more than high school generally have higher total activity than males.
+As expected, total activity is generally highest for younger ages and lowest for older ages. The smooth lines indicate that females with education high school equivalent or more than high school generally have higher total activity than males.
 
 
-Make a three-panel plot that shows the 24-hour activity time courses for each education level and use color to indicate sex. 
+Plot 24-hour activity time courses
 ```{r}
 mims_activity_df=
   mims_df |> 
@@ -193,12 +205,7 @@ ggplot_activity=
 
 ggplot_activity
 ```
-Describe in words any patterns or conclusions you can make based on this graph; including smooth trends may help identify differences.
---Activity level during daylight hours seems to be slightly higher among people with more than a high school education compared to people with high school equivalent or less than. Additionally, it seems like there are no major differences between male and female activity levels for any education level, except with females being slightly more active than males for those who have higher than high school-level education.
-
-
-
-
+Activity level during daylight hours seems to be slightly higher among people with more than a high school education compared to people with high school equivalent or less than. Additionally, it seems like there are no major differences between male and female activity levels for any education level, except with females being slightly more active than males for those who have higher than high school-level education.
 
 ## Problem 3
 
@@ -241,10 +248,8 @@ july_df= bind_rows(july20_df, july24_df)
 jan_df=bind_rows(jan20_df, jan24_df)
 
 bike_df= bind_rows(july_df, jan_df)
-
 ```
-Describe the resulting dataset.
---The combined dataset of the 1% of citibike rides <4 hours from July2020, July2024, Jan2020, and Jan2024 includes two new rows that indicate the "month" and "year" the ride comes from.
+The combined dataset of 1% of citibike rides <4 hours from July2020, July2024, Jan2020, and Jan2024 includes two new rows that indicate the "month" and "year" the ride comes from. The dataset includes information like the type of bike (aka variable 'rideable_type') whcih could be classic or electric, as well as the duration of the ride in minutes.
 
 Reader-friendly table
 ```{r}
@@ -255,9 +260,10 @@ bike_df |>
   ) |> 
   knitr::kable()
 ```
-INSERT COMMENT
+Citi Bike members have significantly more rides for each month/year. For both members and casual riders, the number of rides increases from January to July in 2020 and 2024, which makes sense due to nicer weather in July. 
 
-Make a table showing the 5 most popular starting stations for July 2024; include the number of rides originating from these stations.
+
+Table showing the 5 most popular starting stations for July 2024
 ```{r}
 bike_df |> 
   filter(month== "july", year== "2024") |> 
@@ -270,10 +276,35 @@ bike_df |>
   knitr::kable()
 ```
 
-Make a plot to investigate the effects of day of the week, month, and year on median ride duration. This plot can include one or more panels, but should facilitate comparison across all variables of interest. Comment on your observations from this plot.
+Make a plot to investigate the effects of day of the week, month, and year on median ride duration.
+```{r}
+bike_df |> 
+   mutate(weekdays= factor(weekdays, levels= c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday") )) |> 
+  group_by(month, year, weekdays) |> 
+  summarize(med_dur=median(duration)) |> 
+  ggplot(aes(x=weekdays, y=med_dur, color=year)) +
+  geom_point() +
+  facet_grid(.~ month) +
+    labs(title = "Median Ride Duration by Year, Month and Weekday",
+       x = "Weekday",
+       y = "Median Duration (min)")
+```
+Median duration of bikerides was higher in 2020 for all weekdays and both months, and they are especially higher in July 2020 vs 2024 (maybe because of pandemic in July 2020). Also, it makes sense that for both 2020 and 2024, almost all median July bikeride durations are greater compared to January, because it is during the summer.
 
 
-
+For data in 2024, make a figure that shows the impact of month, membership status, and bike type on the distribution of ride duration. 
+```{r}
+bike_df |> 
+  mutate(year== "2024") |> 
+  ggplot(aes(x=duration, y=month, fill=member_casual))+
+  geom_boxplot()+
+  facet_wrap(.~rideable_type) +
+  labs(title = "Impact of Month, Membership Status, and Bike Type on Ride Duration",
+       x = "Ride Duration (min)",
+       y = "Month",
+       fill = "Membership Status") 
+```
+Based on the graph of 2024 data, it appears that median bike ride duration is slightly longer for casual (non-member) Citi Bikers in both July and January. Additionally, it is apparent that the duration of bike rides is longer in July compared to January. And there doesn't seem to be any significant differences in classic bike vs electric bike duration in January or July by members/casual riders. The only difference of note would be that there are slightly longer rides for classic bikes compared to electric bikes among casual riders.
 
 
 
