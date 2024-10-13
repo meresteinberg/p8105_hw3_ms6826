@@ -64,6 +64,7 @@ ggplot_avgtmax=
   station_avgtmax |> 
  ggplot(aes(x=year, y=mean_tmax, group=id)) +
   geom_point()  +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   facet_grid(. ~ month)
 
 ggplot_avgtmax
@@ -193,6 +194,7 @@ mims_activity_df=
 ggplot_activity=
   mims_activity_df |> 
   ggplot(aes(x=minute, y=activity, color=sex, group=seqn)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   geom_line(alpha=.1) +
   geom_smooth(aes(group=sex), se= FALSE)+
   facet_wrap(.~ education) +
@@ -284,6 +286,7 @@ bike_df |>
   summarize(med_dur=median(duration)) |> 
   ggplot(aes(x=weekdays, y=med_dur, color=year)) +
   geom_point() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_grid(.~ month) +
     labs(title = "Median Ride Duration by Year, Month and Weekday",
        x = "Weekday",
