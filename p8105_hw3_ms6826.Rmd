@@ -141,6 +141,9 @@ mims_df |>
   summarize(
     n_obs=n()
   ) |> 
+   pivot_wider(
+    names_from = sex, 
+    values_from = n_obs) |> 
   knitr::kable()
 
 ggp_age=
@@ -260,6 +263,9 @@ bike_df |>
   summarize(
     n_obs=n(),
   ) |> 
+    pivot_wider(
+    names_from = member_casual, 
+    values_from = n_obs) |> 
   knitr::kable()
 ```
 Citi Bike members have significantly more rides for each month/year. For both members and casual riders, the number of rides increases from January to July in 2020 and 2024, which makes sense due to nicer weather in July. 
